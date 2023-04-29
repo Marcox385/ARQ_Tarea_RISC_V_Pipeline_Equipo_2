@@ -16,12 +16,12 @@
 ******************************************************************/
 
 `timescale 1ps/1ps
-module RISC_V_Single_Cycle_TB;
+module RISC_V_Pipeline_TB;
 reg clk_tb = 0;
 reg reset_tb = 0;  
   
   
-RISC_V_Single_Cycle
+RISC_V_Pipeline
 DUV
 (
 	.clk(clk_tb),
