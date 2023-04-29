@@ -20,7 +20,7 @@
 *	IS727550 - Diaz Aguayo; IS727272 - Cordero Hernandez
 ******************************************************************/
 
-module RISC_V_Single_Cycle
+module RISC_V_Pipeline
 #(
 	parameter PROGRAM_MEMORY_DEPTH = 64,
 	parameter DATA_MEMORY_DEPTH = 128
@@ -71,6 +71,10 @@ wire [3:0] alu_operation_w;
 /**Instruction Bus**/	
 wire [31:0] instruction_bus_w;
 
+/* Pipeline wires/helpers */
+wire [31:0] ifid_instruction;
+wire [21:0] ifid_pc_plus_4;
+
 
 //******************************************************************/
 //******************************************************************/
@@ -81,7 +85,7 @@ Control
 CONTROL_UNIT
 (
 	/****/
-	.OP_i(instruction_bus_w[6:0]),
+	.OP_i(ifid_instruction[6:0]),
 	/** outputus**/
 	.ALU_Op_o(alu_op_w),
 	.ALU_Src_o(alu_src_w),
@@ -96,7 +100,7 @@ PROGRAM_COUNTER
 (
 	.clk(clk),
 	.reset(reset),
-	.Next_PC(pc_plus_4_w),
+	.Next_PC(ifid_pc_plus_4),
 	
 	.PC_Value(pc_w)
 );
@@ -137,8 +141,8 @@ REGISTER_FILE_UNIT
 	.reset(reset),
 	.Reg_Write_i(reg_write_w),
 	.Write_Register_i(instruction_bus_w[11:7]),
-	.Read_Register_1_i(instruction_bus_w[19:15]),
-	.Read_Register_2_i(instruction_bus_w[24:20]),
+	.Read_Register_1_i(ifid_instruction[19:15]),
+	.Read_Register_2_i(ifid_instruction[24:20]),
 	.Write_Data_i(alu_result_w),
 	.Read_Data_1_o(read_data_1_w),
 	.Read_Data_2_o(read_data_2_w)
@@ -149,8 +153,8 @@ REGISTER_FILE_UNIT
 
 Immediate_Unit
 IMM_UNIT
-(  .op_i(instruction_bus_w[6:0]),
-   .Instruction_bus_i(instruction_bus_w),
+(  .op_i(ifid_instruction[6:0]),
+   .Instruction_bus_i(ifid_instruction),
    .Immediate_o(inmmediate_data_w)
 );
 
@@ -174,9 +178,9 @@ MUX_DATA_OR_IMM_FOR_ALU
 ALU_Control
 ALU_CONTROL_UNIT
 (
-	.funct7_i(instruction_bus_w[30]),
+	.funct7_i(ifid_instruction[30]),
 	.ALU_Op_i(alu_op_w),
-	.funct3_i(instruction_bus_w[14:12]),
+	.funct3_i(ifid_instruction[14:12]),
 	.ALU_Operation_o(alu_operation_w)
 
 );
@@ -193,6 +197,18 @@ ALU_UNIT
 );
 
 
+/* Pipeline units */
+Fetch_Decode_Unit
+IFID
+(
+	.clk(clk),
+	.reset(reset),
+	.instruction_in(instruction_bus_w),
+	.pc_plus_4_in(pc_plus_4_w),
+	
+	.instruction_out(ifid_instruction),
+	.pc_plus_4_out(ifid_pc_plus_4)
+);
 
 
 endmodule
