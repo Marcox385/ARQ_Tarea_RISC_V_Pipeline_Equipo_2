@@ -75,6 +75,14 @@ wire [31:0] instruction_bus_w;
 wire [31:0] ifid_instruction;
 wire [21:0] ifid_pc_plus_4;
 
+wire [31:0] idie_imm;
+wire [31:0] idie_read_data_1;
+wire [31:0] idie_read_data_2;
+wire [31:0] idie_mux_helper;
+wire [4:0] idie_write_register;
+wire [3:0] idie_alu_operation;
+wire idie_write;
+
 
 //******************************************************************/
 //******************************************************************/
@@ -167,10 +175,10 @@ Multiplexer_2_to_1
 MUX_DATA_OR_IMM_FOR_ALU
 (
 	.Selector_i(alu_src_w),
-	.Mux_Data_0_i(read_data_2_w),
-	.Mux_Data_1_i(inmmediate_data_w),
+	.Mux_Data_0_i(idie_read_data_2),
+	.Mux_Data_1_i(idie_imm),
 	
-	.Mux_Output_o(read_data_2_or_imm_w)
+	.Mux_Output_o(idie_mux_helper)
 
 );
 
@@ -208,6 +216,26 @@ IFID
 	
 	.instruction_out(ifid_instruction),
 	.pc_plus_4_out(ifid_pc_plus_4)
+);
+
+Decode_Execute_Unit
+IDIE
+(
+	.clk(clk),
+	.reset(reset),
+	.immediate_in(inmmediate_data_w),
+	.read_data_1(read_data_1_w),
+	.read_data_2(read_data_2_w),
+	.write_register_in(ifid_instruction[11:7]),
+	.alu_operation_in(alu_operation_w),
+	.write_in(reg_write_w),
+	
+	.immediate_out(idie_imm),
+	.read_data_1_out(idie_read_data_1),
+	.read_data_2_out(idie_read_data_2),
+	.write_register_out(idie_write_register),
+	.alu_operation_out(idie_alu_operation),
+	.write_out(idie_write)
 );
 
 

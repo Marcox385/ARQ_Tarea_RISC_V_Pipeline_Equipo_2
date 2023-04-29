@@ -19,7 +19,7 @@ module Fetch_Decode_Unit
 
 always @(negedge reset or posedge clk)
 	begin
-		instruction_out = (reset == 0) ? 0 : instruction_in;
-		pc_plus_4_out = (reset == 0) ? 0 : pc_plus_4_in;
+		instruction_out <= (reset == 0) ? 0 : instruction_in;
+		pc_plus_4_out <= (reset == 0) ? 0 : pc_plus_4_in;
 	end
 endmodule
