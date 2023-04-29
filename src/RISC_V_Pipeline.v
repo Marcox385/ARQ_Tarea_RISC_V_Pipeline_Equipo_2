@@ -83,6 +83,10 @@ wire [4:0] idie_write_register;
 wire [3:0] idie_alu_operation;
 wire idie_write;
 
+wire [31:0] iema_alu_result;
+wire [4:0] iema_write_register;
+wire iema_write;
+
 
 //******************************************************************/
 //******************************************************************/
@@ -147,8 +151,8 @@ REGISTER_FILE_UNIT
 (
 	.clk(clk),
 	.reset(reset),
-	.Reg_Write_i(reg_write_w),
-	.Write_Register_i(instruction_bus_w[11:7]),
+	.Reg_Write_i(iema_write),
+	.Write_Register_i(iema_write_register),
 	.Read_Register_1_i(ifid_instruction[19:15]),
 	.Read_Register_2_i(ifid_instruction[24:20]),
 	.Write_Data_i(alu_result_w),
@@ -236,6 +240,20 @@ IDIE
 	.write_register_out(idie_write_register),
 	.alu_operation_out(idie_alu_operation),
 	.write_out(idie_write)
+);
+
+Execute_MemAccess_Unit
+IEMA
+(
+	.clk(clk),
+	.reset(reset),
+	.alu_result_in(alu_result_w),
+	.write_register_in(iema_write_register),
+	.write_in(idie_write),
+	
+	.alu_result_out(iema_alu_result),
+	.write_register_out(idie_write_register),
+	.write_out(iema_write)
 );
 
 

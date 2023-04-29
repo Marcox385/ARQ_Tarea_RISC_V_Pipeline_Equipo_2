@@ -6,21 +6,24 @@
 *	IS727550 - Diaz Aguayo; IS727272 - Cordero Hernandez
 ******************************************************************/
 
-module Fetch_Decode_Unit
+module Execute_MemAccess_Unit
 (
 	input clk,
 	input reset,
-	input [31:0] instruction_in,
-	input [31:0] pc_plus_4_in,
-	
-	output reg [31:0] instruction_out,
-	output reg [31:0] pc_plus_4_out
+	input [31:0] alu_result_in,
+	input [4:0] write_register_in,
+	input write_in,
+
+	output reg [31:0] alu_result_out,
+	output reg [4:0] write_register_out,
+	output reg write_out
 );
 
 always @(negedge reset or posedge clk)
 begin
-	instruction_out <= (reset != 0) ? instruction_in : 0;
-	pc_plus_4_out <= (reset != 0) ? ? pc_plus_4_inpc_plus_4_in : 0;
+	alu_result_out <= (reset != 0) ? alu_result_in : 0;
+	write_register_out <= (reset != 0) ? write_register_in : 0;
+	write_out <= (reset != 0) ? write_in : 0;
 end
 
 endmodule
